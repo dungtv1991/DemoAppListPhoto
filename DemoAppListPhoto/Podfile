@@ -1,0 +1,20 @@
+use_frameworks!
+
+target 'DemoAppListPhoto' do
+  
+	pod 'SnapKit', '~> 5.0.0'
+	pod 'Alamofire', '~> 5.2'
+  pod 'AdaptationKit'
+  pod 'SDWebImage', '~> 5.0'
+
+  
+  target 'DemoAppListPhotoTests' do
+    inherit! :search_paths
+    # Pods for testing
+  end
+
+  target 'DemoAppListPhotoUITests' do
+    # Pods for testing
+  end
+
+end

@@ -1,0 +1,6 @@
+framework module AdaptationKit {
+  umbrella header "AdaptationKit-umbrella.h"
+
+  export *
+  module * { export * }
+}

@@ -1,0 +1,30 @@
+PODS:
+  - AdaptationKit (0.1.1)
+  - Alamofire (5.4.0)
+  - SDWebImage (5.9.5):
+    - SDWebImage/Core (= 5.9.5)
+  - SDWebImage/Core (5.9.5)
+  - SnapKit (5.0.1)
+
+DEPENDENCIES:
+  - AdaptationKit
+  - Alamofire (~> 5.2)
+  - SDWebImage (~> 5.0)
+  - SnapKit (~> 5.0.0)
+
+SPEC REPOS:
+  trunk:
+    - AdaptationKit
+    - Alamofire
+    - SDWebImage
+    - SnapKit
+
+SPEC CHECKSUMS:
+  AdaptationKit: b8929dd87ed70e2bfc6dcdc47a959605008fab24
+  Alamofire: 3b6a534a3df22db367e4dedeeca73d1ddfcf0e2f
+  SDWebImage: 0b2ba0d56479bf6a45ecddbfd5558bea93150d25
+  SnapKit: 97b92857e3df3a0c71833cce143274bf6ef8e5eb
+
+PODFILE CHECKSUM: 2fb03bc063353946ea63915aad94f1791179360e
+
+COCOAPODS: 1.8.4
