@@ -168,7 +168,7 @@ class HomePageViewController: UIViewController {
     }
     
     deinit {
-        NotificationCenter.default.removeObserver(UIDevice.orientationDidChangeNotification)
+        NotificationCenter.default.removeObserver(self)
         print("Controller is Denit")
     }
 
