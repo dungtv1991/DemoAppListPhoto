@@ -16,6 +16,7 @@ class HomePageViewModel {
     var pictureModel:[PictureModel] = []
     var count:Int = 0
     var isLoading:Bool = false
+    var isChangeType:Bool = false
     
     func fetchDataHomePage(page:Int,refresh:Bool ,completion: @escaping (_ statusCode:Int) -> Void) {
         if refresh == true {
@@ -36,16 +37,54 @@ class HomePageViewModel {
 
     }
     
-    func cellForItem(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath,isChangeType:Bool ) -> UICollectionViewCell {
-        if !isChangeType {
+    @objc private func loadMoreData(collectionView:UICollectionView){
+    
+        if !isLoading {
+            self.isLoading = true
+            self.page += 1
+            self.fetchDataHomePage(page: self.page, refresh: false) { (statusCode) in
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2, execute: {
+                    collectionView.reloadData()
+                })
+                self.isLoading = false
+            }
+        }
+        
+    }
+    
+    func saveChange() -> Bool {
+        let state = UserDefaults.standard.bool(forKey: "change")
+        self.isChangeType = state
+        return state
+    }
+    
+    func handleSegmentedControlChange(collectionView:UICollectionView) {
+        let userDegault = UserDefaults.standard
+        self.isChangeType = !self.isChangeType
+        userDegault.setValue(self.isChangeType, forKey: "change")
+        collectionView.reloadData()
+    }
+    
+    func selectedSegmentedController(refreshController:UISegmentedControl){
+        let typeChange = self.saveChange()
+        refreshController.selectedSegmentIndex = typeChange ? 1 : 0
+    }
+}
+
+extension HomePageViewModel {
+    
+    func cellForItem(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        if !self.isChangeType {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: HorizontalCell.horizontalCellIdentifier, for: indexPath) as! HorizontalCell
             if self.pictureModel.count != 0 {
+                cell.prepareForReuse()
                 cell.bindUI(pictureModel: self.pictureModel[indexPath.row])
             }
             return cell
         }
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: VerticalCell.verticalCellIdentifier, for: indexPath) as! VerticalCell
         if self.pictureModel.count != 0 {
+            cell.prepareForReuse()
             cell.bindUI(pictureModel: self.pictureModel[indexPath.row])
         }
         return cell
@@ -55,11 +94,11 @@ class HomePageViewModel {
         return self.pictureModel.count
     }
     
-    func sizeForRow(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath, isChangeType:Bool) -> CGSize {
+    func sizeForRow(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
     
         if UIDevice.current.userInterfaceIdiom == .pad {
             let orientation = UIApplication.shared.statusBarOrientation
-            if isChangeType {
+            if !self.isChangeType {
                 if(orientation == .landscapeLeft || orientation == .landscapeRight) {
                     return CGSize(width: (UIScreen.main.bounds.width - 40.adaptInch()) / 3, height: 65.adaptInch())
                 } else {
@@ -75,7 +114,7 @@ class HomePageViewModel {
             
         }
         
-        if isChangeType {
+        if !self.isChangeType {
             return CGSize.init(width: (UIScreen.main.bounds.width - 20.adaptInch()), height: (130.adaptInch()))
         }else {
             return CGSize.init(width: (UIScreen.main.bounds.width - 30.adaptInch()) / 2, height: collectionView.bounds.height / 3.5)
@@ -115,26 +154,4 @@ class HomePageViewModel {
 
     }
     
-    @objc private func loadMoreData(collectionView:UICollectionView){
-    
-        if !isLoading {
-            self.isLoading = true
-            self.page += 1
-            self.fetchDataHomePage(page: self.page, refresh: false) { (statusCode) in
-                DispatchQueue.main.asyncAfter(deadline: .now() + 2, execute: {
-                    collectionView.reloadData()
-                })
-                self.isLoading = false
-            }
-        }
-        
-    }
-    
-    func saveChange() -> Bool {
-        let state = UserDefaults.standard.bool(forKey: "change")
-        return state
-    }
-    
-    
 }
-

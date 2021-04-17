@@ -135,7 +135,8 @@ class VerticalCell: UICollectionViewCell {
                             self.layoutIfNeeded()
 
                     } else {
-                            self.pictureImageView.sd_setImage(with: URL(string: newURLString), placeholderImage: nil, context: [.imageTransformer: transformer],progress: nil, completed: { (image, error, cacheType, imageUR) in
+                            self.pictureImageView.sd_setImage(with: URL(string: newURLString), placeholderImage: nil, context: [.imageTransformer: transformer],progress: nil, completed: {[weak self] (image, error, cacheType, imageUR) in
+                                guard let `self` = self else  {return}
                                 if let image = image {
                                     SDImageCache.shared.store(image, forKey: pictureModel.id, toDisk: true) {
                                         self.placeHolderView.isHidden = true

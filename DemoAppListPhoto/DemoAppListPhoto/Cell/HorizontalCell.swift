@@ -117,7 +117,6 @@ class HorizontalCell: UICollectionViewCell {
         
         self.autoLayoutUI()
         
-        self.pictureImageView.image = nil
         self.spinner.startAnimating()
 
         if let imageURL = pictureModel.download_url {
@@ -125,6 +124,7 @@ class HorizontalCell: UICollectionViewCell {
             let newURLString = imageURLArray[0] + "/" + imageURLArray[1] + "/" + imageURLArray[2] + "/" + imageURLArray[3] + "/" + imageURLArray[4] + "/\(510)/\(382)"
             let transformer = SDImageResizingTransformer(size: CGSize(width: 510, height: 382), scaleMode: .fill)
             SDImageCache.shared.diskImageExists(withKey: pictureModel.id) { isInCache in
+            
                 DispatchQueue.main.async {
                     if isInCache {
                         let image = SDImageCache.shared.imageFromDiskCache(forKey: pictureModel.id)
@@ -135,7 +135,8 @@ class HorizontalCell: UICollectionViewCell {
                             self.layoutIfNeeded()
 
                     } else {
-                            self.pictureImageView.sd_setImage(with: URL(string: newURLString), placeholderImage: nil, context: [.imageTransformer: transformer],progress: nil, completed: { (image, error, cacheType, imageUR) in
+                            self.pictureImageView.sd_setImage(with: URL(string: newURLString), placeholderImage: nil, context: [.imageTransformer: transformer],progress: nil, completed: { [weak self] (image, error, cacheType, imageUR) in
+                                guard let `self` = self else {return}
                                 if let image = image {
                                     SDImageCache.shared.store(image, forKey: pictureModel.id, toDisk: true) {
                                         self.placeHolderView.isHidden = true

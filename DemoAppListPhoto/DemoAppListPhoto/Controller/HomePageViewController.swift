@@ -12,8 +12,6 @@ import SDWebImage
 
 class HomePageViewController: UIViewController {
 
-    var isChangeType:Bool = false
-
     var refresher:UIRefreshControl!
     
     lazy var collectionView:UICollectionView = {
@@ -50,14 +48,13 @@ class HomePageViewController: UIViewController {
         self.selectedSegmentedController()
         
         self.fetchData(pullToRefresh: false)
+        self.configCollectionView()
+        self.setNotificationObserverRotate()
+        self.setUpToRefresh()
         
         self.view.backgroundColor = .white
         self.view.addSubview(self.segmentedControl)
         self.view.addSubview(self.collectionView)
-        
-        self.configCollectionView()
-        self.setNotificationObserverRotate()
-        self.setUpToRefresh()
 
     }
     
@@ -93,8 +90,7 @@ class HomePageViewController: UIViewController {
     }
     
     private func selectedSegmentedController(){
-        self.isChangeType = self.homePageViewModel.saveChange()
-        self.segmentedControl.selectedSegmentIndex = self.isChangeType ? 1 : 0
+        self.homePageViewModel.selectedSegmentedController(refreshController: self.segmentedControl)
     }
     
     private func setNotificationObserverRotate(){
@@ -140,10 +136,7 @@ class HomePageViewController: UIViewController {
     }
     
     @objc func handleSegmentedControlChange() {
-        let userDegault = UserDefaults.standard
-        self.isChangeType = !self.isChangeType
-        userDegault.setValue(self.isChangeType, forKey: "change")
-        self.collectionView.reloadData()
+        self.homePageViewModel.handleSegmentedControlChange(collectionView: self.collectionView)
     }
     
     @objc func orientationChanged(notification : NSNotification) {
@@ -160,7 +153,9 @@ class HomePageViewController: UIViewController {
             self.view.addSubview(self.failedLoadingLabel)
             self.failedLoadingLabel.text = "Failed loading images. Http code: \(statusCode)"
             self.failedLoadingLabel.center = self.view.center
-            self.collectionView.isHidden = true
+            DispatchQueue.main.async {
+                self.collectionView.isHidden = true
+            }
             return
         }else {
             DispatchQueue.main.async {
@@ -170,6 +165,11 @@ class HomePageViewController: UIViewController {
             }
         }
         
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(UIDevice.orientationDidChangeNotification)
+        print("Controller is Denit")
     }
 
 }
@@ -181,11 +181,11 @@ extension HomePageViewController : UICollectionViewDelegate, UICollectionViewDel
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        return self.homePageViewModel.cellForItem(collectionView, cellForItemAt: indexPath, isChangeType: self.isChangeType)
+        return self.homePageViewModel.cellForItem(collectionView, cellForItemAt: indexPath)
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return self.homePageViewModel.sizeForRow(collectionView, layout: collectionViewLayout, sizeForItemAt: indexPath, isChangeType: !self.isChangeType)
+        return self.homePageViewModel.sizeForRow(collectionView, layout: collectionViewLayout, sizeForItemAt: indexPath)
     }
  
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
